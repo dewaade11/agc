@@ -34,32 +34,3 @@ docker run -d --name=nginxproxymanager \
  jc21/nginx-proxy-manager
 
 echo "Proses selesai! Silakan logout dan login kembali agar perubahan grup Docker berlaku."
-
-
-# Nama kontainer Docker
-CONTAINER_NAME="nginxproxymanager"
-
-# Email dan password baru
-NEW_EMAIL="ketara@gmail.com"
-NEW_PASSWORD="oliolio@651614"
-
-# Periksa apakah kontainer berjalan
-if ! sudo docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-  echo "Kontainer ${CONTAINER_NAME} tidak ditemukan atau tidak berjalan."
-  exit 1
-fi
-
-# Masuk ke dalam kontainer dan instal sqlite3 jika diperlukan
-echo "Menginstal sqlite3 di dalam kontainer ${CONTAINER_NAME}..."
-sudo docker exec -it $CONTAINER_NAME bash -c "apt-get update && apt-get install sqlite3 -y"
-
-# Jalankan query untuk mengubah email dan password
-echo "Memperbarui email dan password di database SQLite..."
-sudo docker exec -it $CONTAINER_NAME bash -c "sqlite3 /data/database.sqlite \"UPDATE user SET email='${NEW_EMAIL}', password='${NEW_PASSWORD}' WHERE email='admin@example.com';\""
-
-# Restart kontainer
-echo "Merestart kontainer ${CONTAINER_NAME}..."
-sudo docker restart $CONTAINER_NAME
-
-echo "Perubahan email dan password selesai. Login dengan email: ${NEW_EMAIL} dan password baru."
-
