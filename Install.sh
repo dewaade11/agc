@@ -34,3 +34,27 @@ docker run -d --name=nginxproxymanager \
  jc21/nginx-proxy-manager
 
 echo "Proses selesai! Silakan logout dan login kembali agar perubahan grup Docker berlaku."
+
+# Variabel
+EMAIL="ketara@gmail.com"
+NEW_PASSWORD="oliolio@651614"
+CONTAINER_NAME="nginxproxymanager"
+DATABASE_PATH="/data/database.sqlite"
+
+# Cek apakah script dijalankan dengan akses root (sudo)
+if [ "$(id -u)" -ne 0 ]; then
+  echo "Harap jalankan script ini dengan sudo atau sebagai root"
+  exit 1
+fi
+
+# Masuk ke kontainer dan buka database SQLite untuk mengganti password
+echo "Mengganti password untuk email: $EMAIL..."
+
+# Jalankan perintah SQL untuk mengupdate password
+docker exec -i $CONTAINER_NAME sqlite3 $DATABASE_PATH "UPDATE user SET password='$NEW_PASSWORD' WHERE email='$EMAIL';"
+
+# Restart kontainer Nginx Proxy Manager agar perubahan diterapkan
+echo "Restarting Nginx Proxy Manager container..."
+docker restart $CONTAINER_NAME
+
+echo "Password telah berhasil diubah untuk pengguna dengan email $EMAIL."
