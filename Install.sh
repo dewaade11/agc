@@ -35,26 +35,31 @@ docker run -d --name=nginxproxymanager \
 
 echo "Proses selesai! Silakan logout dan login kembali agar perubahan grup Docker berlaku."
 
-# Variabel
-EMAIL="ketara@gmail.com"
-NEW_PASSWORD="oliolio@651614"
-CONTAINER_NAME="nginxproxymanager"
-DATABASE_PATH="/data/database.sqlite"
 
-# Cek apakah script dijalankan dengan akses root (sudo)
-if [ "$(id -u)" -ne 0 ]; then
-  echo "Harap jalankan script ini dengan sudo atau sebagai root"
+# Nama kontainer Docker
+CONTAINER_NAME="nginxproxymanager"
+
+# Email dan password baru
+NEW_EMAIL="ketara@gmail.com"
+NEW_PASSWORD="oliolio@651614"
+
+# Periksa apakah kontainer berjalan
+if ! sudo docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+  echo "Kontainer ${CONTAINER_NAME} tidak ditemukan atau tidak berjalan."
   exit 1
 fi
 
-# Masuk ke kontainer dan buka database SQLite untuk mengganti password
-echo "Mengganti password untuk email: $EMAIL..."
+# Masuk ke dalam kontainer dan instal sqlite3 jika diperlukan
+echo "Menginstal sqlite3 di dalam kontainer ${CONTAINER_NAME}..."
+sudo docker exec -it $CONTAINER_NAME bash -c "apt-get update && apt-get install sqlite3 -y"
 
-# Jalankan perintah SQL untuk mengupdate password
-docker exec -i $CONTAINER_NAME sqlite3 $DATABASE_PATH "UPDATE user SET password='$NEW_PASSWORD' WHERE email='$EMAIL';"
+# Jalankan query untuk mengubah email dan password
+echo "Memperbarui email dan password di database SQLite..."
+sudo docker exec -it $CONTAINER_NAME bash -c "sqlite3 /data/database.sqlite \"UPDATE user SET email='${NEW_EMAIL}', password='${NEW_PASSWORD}' WHERE email='admin@example.com';\""
 
-# Restart kontainer Nginx Proxy Manager agar perubahan diterapkan
-echo "Restarting Nginx Proxy Manager container..."
-docker restart $CONTAINER_NAME
+# Restart kontainer
+echo "Merestart kontainer ${CONTAINER_NAME}..."
+sudo docker restart $CONTAINER_NAME
 
-echo "Password telah berhasil diubah untuk pengguna dengan email $EMAIL."
+echo "Perubahan email dan password selesai. Login dengan email: ${NEW_EMAIL} dan password baru."
+
