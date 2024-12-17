@@ -9,19 +9,28 @@ sudo apt install -y curl
 echo "Menginstal nvm..."
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
-# Memuat nvm ke dalam lingkungan
+# Memuat nvm ke dalam lingkungan saat script berjalan
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \ . "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \ . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+source "$NVM_DIR/nvm.sh"  # Memuat nvm
+source "$NVM_DIR/bash_completion"  # Memuat bash completion
 
 # Memeriksa versi Node.js yang tersedia dan menginstal Node.js serta npm
 echo "Menginstal Node.js dan npm..."
 nvm install v20.13.0
 nvm use v20.13.0
 
+# Memastikan npm dan Node.js terinstall
+echo "Memeriksa instalasi Node.js dan npm..."
+node -v
+npm -v
+
 # Menginstal PM2
 echo "Menginstal PM2..."
 npm install pm2 -g
+
+# Memeriksa instalasi PM2
+echo "Memeriksa instalasi PM2..."
+pm2 -v
 
 # Menginstal Docker
 echo "Menginstal Docker..."
