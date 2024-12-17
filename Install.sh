@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Update dan install dependencies dasar
-echo "Memperbarui sistem dan menginstal curl..."
+echo "Memperbarui sistem dan menginstal curl dan unzip..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl
+sudo apt install -y curl unzip
 
 # Menginstal nvm
 echo "Menginstal nvm..."
